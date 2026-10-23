@@ -1,0 +1,18 @@
+{
+"scene": "D1",
+"script_kind": "one_notch",
+"start": [
+0.0,
+0.0,
+50.0
+],
+"duration": 2.0,
+"events": [
+{
+"i": 0,
+"t": 1.0,
+"type": "wheel",
+"steps": 1.0
+}
+]
+}

@@ -1,0 +1,71 @@
+fault (f): 입력 이벤트 하나(번호 100)를 매개변수에 반영하지 않음
+file viewer\app.py
+-         self.state = params.apply_event(self.state, ev)
++         self.state = self.state if self.applied == 99 else params.apply_event(self.state, ev)
+
+start <time>
+sha256 original 7009dc439757db5eb36bb6c97a229ac50bd8e8338cbc69022e9e7970b1c6b583
+sha256 with fault 86810c5b9a09920e6d1c8bd78934543af5cecad6928f99e746699edbeeecd54a
+sha256 after restore 7009dc439757db5eb36bb6c97a229ac50bd8e8338cbc69022e9e7970b1c6b583
+pytest returncode 1
+
+...FF......                                                              [100%]
+================================== FAILURES ===================================
+_____________________ test_verify_replay_every_frame[D1] ______________________
+
+gpu = <module 'mytet_cuda.gpu' from 'cuda\\mytet_cuda\\gpu.py'>
+run_dir = WindowsPath('cuda/test_out/<run>')
+scene = 'D1'
+
+    @pytest.mark.parametrize("scene", ["D1", "Z1"])
+    def test_verify_replay_every_frame(gpu, run_dir, scene):
+        """Untimed verify replay (one input per frame, every frame read back)."""
+        d = replay(run_dir, scene, "verify", "all")
+        r = vc.check_run(d)
+        disp = vc.check_display(d)
+        (d / "check.json").write_text(json.dumps({"run": r, "display": disp}, indent=1), encoding="utf-8")
+        assert r["events_delivered"] == r["events"] == 628 and r["counted"] > 600
+        v = violations(r)
+        v += [s for ok, s in ((disp["render_target_mismatch"] == [], "SIG:render_target"),
+                              (disp["back_buffer_mismatch"] == [], "SIG:back_buffer"),
+                              # every frame (fast, precise, the initial one) has both read-backs and all were compared
+                              (disp["frames_missing_readback"] == [] and disp["frames_checked"] == disp["back_buffer_checked"]
+                               == disp["frames"] == r["frames_fast"] + r["precise_frames"] + 1, "SIG:readback_coverage"))
+              if not ok]
+>       assert not v, "SIGS " + " ".join(v)
+E       AssertionError: SIGS SIG:params SIG:precise_params SIG:precise_map SIG:precise_display
+E       assert not ['SIG:params', 'SIG:precise_params', 'SIG:precise_map', 'SIG:precise_display']
+
+tests\test_viewer.py:98: AssertionError
+_____________________ test_verify_replay_every_frame[Z1] ______________________
+
+gpu = <module 'mytet_cuda.gpu' from 'cuda\\mytet_cuda\\gpu.py'>
+run_dir = WindowsPath('cuda/test_out/<run>')
+scene = 'Z1'
+
+    @pytest.mark.parametrize("scene", ["D1", "Z1"])
+    def test_verify_replay_every_frame(gpu, run_dir, scene):
+        """Untimed verify replay (one input per frame, every frame read back)."""
+        d = replay(run_dir, scene, "verify", "all")
+        r = vc.check_run(d)
+        disp = vc.check_display(d)
+        (d / "check.json").write_text(json.dumps({"run": r, "display": disp}, indent=1), encoding="utf-8")
+        assert r["events_delivered"] == r["events"] == 628 and r["counted"] > 600
+        v = violations(r)
+        v += [s for ok, s in ((disp["render_target_mismatch"] == [], "SIG:render_target"),
+                              (disp["back_buffer_mismatch"] == [], "SIG:back_buffer"),
+                              # every frame (fast, precise, the initial one) has both read-backs and all were compared
+                              (disp["frames_missing_readback"] == [] and disp["frames_checked"] == disp["back_buffer_checked"]
+                               == disp["frames"] == r["frames_fast"] + r["precise_frames"] + 1, "SIG:readback_coverage"))
+              if not ok]
+>       assert not v, "SIGS " + " ".join(v)
+E       AssertionError: SIGS SIG:params SIG:precise_params SIG:precise_map SIG:precise_display
+E       assert not ['SIG:params', 'SIG:precise_params', 'SIG:precise_map', 'SIG:precise_display']
+
+tests\test_viewer.py:98: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_viewer.py::test_verify_replay_every_frame[D1] - AssertionEr...
+FAILED tests/test_viewer.py::test_verify_replay_every_frame[Z1] - AssertionEr...
+2 failed, 9 passed in 160.75s (0:02:40)
+
+--- stderr ---

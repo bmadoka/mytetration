@@ -1,0 +1,45 @@
+{
+ "note": "Fixed before measuring. start = (x0, y0, eps).",
+ "scenes": {
+  "D1": {
+   "start": [
+    0.0,
+    0.0,
+    50.0
+   ],
+   "scroll_notches": 100,
+   "source": "existing scene D1"
+  },
+  "Z1": {
+   "start": [
+    -0.43138,
+    0.895038,
+    0.1
+   ],
+   "scroll_notches": 100,
+   "source": "existing scene Z1"
+  },
+  "DZa": {
+   "start": [
+    -0.4650135453678735,
+    0.9182841487408027,
+    2.1877616239495517e-06
+   ],
+   "scroll_notches": 100,
+   "source": "greedy descent search",
+   "f32_distinct_x_at_start": 148,
+   "end_eps": 5.8110009164680343e-11
+  },
+  "DZb": {
+   "start": [
+    -0.4650135453678735,
+    0.9182841487408027,
+    2.8840315031266057e-07
+   ],
+   "scroll_notches": 100,
+   "source": "greedy descent search",
+   "f32_distinct_x_at_start": 20,
+   "end_eps": 7.660391115891445e-12
+  }
+ }
+}

@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+.mplconfig/
+.cupy_cache/
+test_out/
+logs/
+preview_media/
+reference/sets/
+reference/DIFF.md
+tester/out/
+bench/hybrid_b3/test_out/

@@ -1,0 +1,71 @@
+{
+"scene": "Z1",
+"start": [
+-0.43138,
+0.895038,
+0.1
+],
+"events": [
+{
+"type": "wheel",
+"steps": 1,
+"t": 0.03,
+"i": 0
+},
+{
+"type": "wheel",
+"steps": 1,
+"t": 0.06,
+"i": 1
+},
+{
+"type": "wheel",
+"steps": 1,
+"t": 0.09,
+"i": 2
+},
+{
+"type": "wheel",
+"steps": 1,
+"t": 0.12,
+"i": 3
+},
+{
+"type": "wheel",
+"steps": 1,
+"t": 0.15,
+"i": 4
+},
+{
+"type": "wheel",
+"steps": 1,
+"t": 0.18,
+"i": 5
+},
+{
+"type": "wheel",
+"steps": 1,
+"t": 0.21,
+"i": 6
+},
+{
+"type": "wheel",
+"steps": 1,
+"t": 0.24,
+"i": 7
+},
+{
+"type": "drag",
+"dx": -77,
+"dy": 51,
+"t": 0.27,
+"i": 8
+},
+{
+"type": "wheel",
+"steps": -1,
+"t": 2.77,
+"i": 9
+}
+]
+}

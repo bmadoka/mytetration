@@ -1,0 +1,3 @@
+Hybrid checker provenance
+
+Mode, speed, replacement, and warp expectations in viewer_check.py are independently transcribed from the hybrid display rule. They do not call production hybrid.py or the app shader. Block thresholds remain in deepzoom_blocks.py unchanged. Synthetic controls are in test_hybrid_cpu.py.
