@@ -711,3 +711,54 @@ def test_resync_threshold_uses_decimal_without_ambient_abs_rounding(delta,resync
     assert record['resync'] is resync
     assert updated_hp==high and not clamped
     assert updated==(deep_state.project(high) if resync else state)
+
+
+def test_interactive_deep_engine_skips_the_free_memory_rule(monkeypatch,tmp_path):
+    """The FreeVirtualMemory rule protects test, measurement and recording runs. The interactive viewer's deep child
+    must not apply it: with less free memory, a deep zoom would otherwise end the viewer."""
+    import queue
+    import types
+    import deep
+    import mytet_cuda
+    from viewer import deep_worker
+    calls=[]
+    def require_memory():
+        calls.append('require_memory')
+        raise RuntimeError('FreeVirtualMemory 1 KB < 8388608 KB')
+    tools=types.ModuleType('scripts.perturb_tools')
+    tools.require_memory=require_memory
+    tools.audit_gpu=lambda stage,directory:dict(stage=stage)
+    gpu=types.ModuleType('mytet_cuda.gpu')
+    gpu.device_info=lambda:dict(name='fake')
+    gpu.cp=SimpleNamespace(empty=lambda n:None)
+    perturb=types.ModuleType('deep.perturb')
+    monkeypatch.setitem(sys.modules,'scripts.perturb_tools',tools)
+    for package,name,module in ((mytet_cuda,'gpu',gpu),(deep,'perturb',perturb)):
+        monkeypatch.setitem(sys.modules,module.__name__,module)
+        monkeypatch.setattr(package,name,module,raising=False)
+    assert deep_worker.engine_factory_for('interactive') is deep_worker.interactive_gpu_engine
+    assert all(deep_worker.engine_factory_for(m) is None
+               for m in ('timed','verify','media','callbacks','honesty','threaded'))
+    responses=queue.Queue()
+    assert deep_worker.interactive_gpu_engine(tmp_path,responses) is perturb
+    assert calls==[] and responses.get_nowait()['event']=='audit'
+    with pytest.raises(RuntimeError,match='FreeVirtualMemory'):
+        deep_worker.gpu_engine(tmp_path,responses)
+    assert calls==['require_memory']
+
+
+@pytest.mark.parametrize('mode,factory',[('interactive','interactive_gpu_engine'),('threaded',None),('timed',None)])
+def test_viewer_mode_picks_the_deep_engine(monkeypatch,mode,factory):
+    from viewer import deep_worker
+    class Started(Exception):
+        pass
+    seen=[]
+    def recorder(directory,engine_factory=None):
+        seen.append(engine_factory)
+        raise Started
+    monkeypatch.setattr(deep_worker,'ProcessWorker',recorder)
+    v=fake_viewer()
+    v.mode,v.deep_controller=mode,None
+    with pytest.raises(Started):
+        v._deep_frame('fresh',v.state,0.)
+    assert seen==[getattr(deep_worker,factory) if factory else None]

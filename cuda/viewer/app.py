@@ -399,7 +399,7 @@ class Viewer:
     def _deep_frame(self, kind, p, t_decide):
         """Nonblocking deep present: poll child, schedule, transform, present every tick."""
         import numpy as np
-        from viewer.deep_worker import DeepController, ProcessWorker
+        from viewer.deep_worker import DeepController, ProcessWorker, engine_factory_for
         self.source_texture = False
         self.bound_source_fresh_id = None
         high = self.hp[0], self.hp[1], p[2]
@@ -416,7 +416,7 @@ class Viewer:
             self.deep_fallback = image, origin
         if getattr(self, 'deep_controller', None) is None:
             directory = self.log_dir or HERE.parent/'logs/deepzoom2/interactive'
-            self.deep_controller = DeepController(ProcessWorker(directory), directory)
+            self.deep_controller = DeepController(ProcessWorker(directory, engine_factory_for(self.mode)), directory)
         moving = (self.last_input_t is not None and t_decide-self.last_input_t < STOP_DELAY) or p != self.state
         source = self.deep_controller.tick(high, moving, self.applied)
         rec = dict(seq=len(self.frames), kind=kind, last_input=self.applied, k=self.applied,

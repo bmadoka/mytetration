@@ -214,8 +214,7 @@ def test_measure_verdict_requires_every_invariant():
 # Known limitation (README_CUDA.md «한계»: the moved picture shown while moving). While a scene moves faster than new
 # pictures arrive, the viewer shows the last picture moved (hybrid display). In these ids that moved picture fails the
 # block check (<= 2 % block tiles per frame) and the quality check (mismatch to the precise map: mean <= 10 %, max
-# <= 15 %), in this public release and in the development version before it alike; meeting them needs a new display
-# design. Such a run is an expected failure only when every other check passes and each of the three values stays at or
+# <= 15 %); meeting them needs a new display design. Such a run is an expected failure only when every other check passes and each of the three values stays at or
 # below its limit = 1.25 x the largest value measured before (block share, quality mean, quality max). A larger value,
 # any other failed check or exception, and a pass (strict) count as failed.
 KNOWN_MOTION_MEASURED = {  # (kind, scene): largest block share, quality mean, quality max measured before
@@ -318,8 +317,7 @@ def hybrid_manip_replay(hybrid_manip_run):
     return vc.check_replay(hybrid_manip_run)
 
 
-# Known limitation (README_CUDA.md «한계»): two DZb checks sit on their thresholds and change from run to run, in this
-# public release and in the development version before it alike (and without the first-replacement warm-up too):
+# Known limitation (README_CUDA.md «한계»): two DZb checks sit on their thresholds and change from run to run:
 #   - test_hybrid_dzb_scroll_blocks: the largest block share of a replay frame was 0.0182-0.0205 against <= 0.02;
 #   - test_hybrid_dzb_manip_replacement_gap: up to 3 replacement gaps of about 0.253 s against <= 0.25 s.
 # Expected failure only within the ranges below; anything else is failed. Not strict: a pass (xpassed) is allowed.
@@ -513,8 +511,7 @@ def test_deep_auto_switch(gpu,run_dir):
     """Crossing into deep zoom. The deep display is asynchronous (viewer/deep_worker.py): before the first result it
     moves the last shallow picture, then shows coarse (stride 8) and final (stride 1) results moved to the current view;
     final maps are kept in deep_final_maps.npz by request id. Every deep frame's render target is checked against the
-    map it shows. (Until 2026-10-19 this test still expected the earlier synchronous deep frames: mode fresh-only,
-    deep_maps.npz by seq.)"""
+    map it shows."""
     import hashlib
     import numpy as np
     from deep import hp, perturb
@@ -591,8 +588,7 @@ def perturb_limit_run(gpu,run_dir):
 
 def test_deep_limit_notice(perturb_limit_run):
     """Below the limit: the band is drawn over the final deep picture. Its map is kept in deep_final_maps.npz under its
-    request id and shown through deep_view.warp_map (viewer/app.py _deep_frame). (Until 2026-10-19 this test read the
-    earlier deep_maps.npz by frame seq.)"""
+    request id and shown through deep_view.warp_map (viewer/app.py _deep_frame)."""
     import hashlib
     import numpy as np
     from deep import hp

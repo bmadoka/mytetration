@@ -27,16 +27,28 @@ def remember(cache, key, value, capacity):
         cache.popitem(last=False)
 
 
-def gpu_engine(directory, responses):
+def gpu_engine(directory, responses, check_memory=True):
     from mytet_cuda import gpu
     from scripts.perturb_tools import audit_gpu, require_memory
-    require_memory()
+    if check_memory:
+        require_memory()
     device = gpu.device_info()  # chosen-GPU, memory and allocation-limit rules
     gpu.cp.empty(1)             # create the context, then immediately audit THIS pid
     audit = audit_gpu('deep worker context', directory)
     responses.put(dict(event='audit', audit=audit, device=device, t=time.perf_counter()))
     from deep import perturb
     return perturb
+
+
+def interactive_gpu_engine(directory, responses):
+    """The interactive viewer's engine: no FreeVirtualMemory rule. That rule protects test, measurement and
+    recording runs; the interactive viewer keeps only the GPU-memory rule (app.preflight_interactive)."""
+    return gpu_engine(directory, responses, check_memory=False)
+
+
+def engine_factory_for(mode):
+    """Engine of the deep child for a viewer mode (None = gpu_engine, with the memory rule)."""
+    return interactive_gpu_engine if mode == 'interactive' else None
 
 
 def worker_main(requests, responses, directory, engine_factory=None):
